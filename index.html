@@ -22,12 +22,12 @@ body {
 .header::before {
   content: "";
   position: absolute;
-  top: 0;
+  top: -500px;
   left: 50%;
   transform: translateX(-50%);
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(180,0,0,0.25) 0%, transparent 70%);
+  width: 1000px;
+  height: 1000px;
+  background: radial-gradient(circle, rgba(195,0,0,0.25) 0%, transparent 60%);
   filter: blur(80px);
   z-index: 0;
 }
@@ -52,11 +52,11 @@ h1 {
 }
 
 button {
-  background: #0d1e41; /* sötét kékes-fekete */
+  background: #091b3d; /* sötét kékes-fekete */
   color: white;
   border: none;
   padding: 12px 22px;
-  margin: 5px;
+  margin: 20px;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
@@ -111,12 +111,12 @@ tr:nth-child(odd) {
 }
 
 .total {
-  color: #ccaf0b;
+  color: #ffd700;
   font-weight: bold;
 }
 
 .delta {
-  color: #ff4d4d;
+  color: #ff2e2ea6;
   font-size: 12px;
 }
 
@@ -128,9 +128,6 @@ tr:nth-child(odd) {
 }
 </style>
 </head>
-
-
-
 
 <body>
 
@@ -163,7 +160,7 @@ tr:nth-child(odd) {
 </table>
 
 <div class="footer">
-  Utolsó módosítás: 2026. 04. 25 | 21:22
+  Utolsó módosítás: 2026. 04. 25 | 21:40
 </div>
 
 <script>
@@ -179,7 +176,6 @@ function formatTime(s) {
 }
 
 function loadData(file, btn) {
-  // aktív gomb
   document.querySelectorAll("button").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
 

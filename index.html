@@ -1,47 +1,233 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8">
-  <title>Leaderboard</title>
-  <style>
-    body {
-      font-family: Arial;
-      background: #111;
-      color: white;
-      text-align: center;
-    }
-    table {
-      margin: auto;
-      border-collapse: collapse;
-      width: 60%;
-    }
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid #444;
-    }
-    th {
-      background: #222;
-    }
-    tr:hover {
-      background: #333;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Rajtvonal Előkvalifikáció</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0a0a0a;
+  color: white;
+  text-align: center;
+}
+
+/* Felső glow */
+.header {
+  position: relative;
+  padding: 60px 20px 20px;
+}
+
+.header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(180,0,0,0.3) 0%, transparent 70%);
+  filter: blur(60px);
+  z-index: 0;
+}
+
+h1 {
+  position: relative;
+  z-index: 1;
+  font-weight: bold;
+}
+
+.title-red {
+  color: #b30000;
+}
+
+.title-white {
+  color: white;
+}
+
+/* Gombok */
+.buttons {
+  margin-top: 20px;
+}
+
+button {
+  background: #0d1117;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button.active {
+  background: #b30000;
+}
+
+/* Tábla */
+table {
+  margin: 30px auto;
+  border-collapse: collapse;
+  width: 80%;
+  max-width: 900px;
+}
+
+th {
+  background: #0d1117;
+  padding: 10px;
+}
+
+td {
+  padding: 10px;
+}
+
+tr:nth-child(even) {
+  background: #101722;
+}
+
+tr:nth-child(odd) {
+  background: #0c111a;
+}
+
+/* Színezések */
+.rank {
+  font-weight: bold;
+  color: white;
+}
+
+.gold { color: gold; }
+.silver { color: silver; }
+.bronze { color: #cd7f32; }
+
+.name {
+  font-weight: bold;
+  color: white;
+}
+
+.time {
+  color: #cccccc;
+}
+
+.total {
+  color: #ffd700;
+  font-weight: bold;
+}
+
+.delta {
+  color: #ff4d4d;
+  font-size: 12px;
+}
+
+/* Footer */
+.footer {
+  margin-top: 50px;
+  font-size: 10px;
+  color: #777;
+}
+</style>
 </head>
+
 <body>
 
-<h1>Leaderboard</h1>
+<div class="header">
+  <h1>
+    <span class="title-red">Rajtvonal</span>
+    <span class="title-white"> Előkvalifikáció</span>
+  </h1>
 
-<table>
-  <tr>
-    <th>#</th>
-    <th>Név</th>
-    <th>Idő</th>
-  </tr>
+  <div class="buttons">
+    <button onclick="loadData('f1challenge.csv', this)">F1 Challenge (F1 23)</button>
+    <button onclick="loadData('simmasters.csv', this)">Sim Masters (LMU)</button>
+  </div>
+</div>
 
-  <tr><td>1</td><td>Példa</td><td>01:23</td></tr>
-  <tr><td>2</td><td>Valaki</td><td>01:30</td></tr>
-
+<table id="leaderboard" style="display:none;">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Név</th>
+      <th>Pálya1</th>
+      <th>Pálya2</th>
+      <th>Pálya3</th>
+      <th>Összidő</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
 </table>
+
+<div class="footer">
+  Utolsó módosítás: 2026. 04. 25 | 21:05
+</div>
+
+<script>
+function parseTime(t) {
+  let [min, sec] = t.split(":");
+  return parseFloat(min) * 60 + parseFloat(sec);
+}
+
+function formatTime(s) {
+  let min = Math.floor(s / 60);
+  let sec = (s % 60).toFixed(3).padStart(6, '0');
+  return `${min}:${sec}`;
+}
+
+function loadData(file, btn) {
+  document.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+
+  fetch(file)
+    .then(res => res.text())
+    .then(text => {
+      let rows = text.trim().split("\n").map(r => r.split(","));
+
+      let data = rows.map(r => {
+        let t1 = parseTime(r[1]);
+        let t2 = parseTime(r[2]);
+        let t3 = parseTime(r[3]);
+        return {
+          name: r[0],
+          t1, t2, t3,
+          total: t1 + t2 + t3
+        };
+      });
+
+      data.sort((a,b) => a.total - b.total);
+
+      let best = data[0].total;
+
+      let tbody = document.querySelector("#leaderboard tbody");
+      tbody.innerHTML = "";
+
+      data.forEach((d, i) => {
+        let tr = document.createElement("tr");
+
+        let rankClass = "";
+        if (i === 0) rankClass = "gold";
+        else if (i === 1) rankClass = "silver";
+        else if (i === 2) rankClass = "bronze";
+
+        let delta = d.total - best;
+
+        tr.innerHTML = `
+          <td class="rank ${rankClass}">${i+1}</td>
+          <td class="name">${d.name}</td>
+          <td class="time">${formatTime(d.t1)}</td>
+          <td class="time">${formatTime(d.t2)}</td>
+          <td class="time">${formatTime(d.t3)}</td>
+          <td class="total">
+            ${formatTime(d.total)}
+            ${i !== 0 ? `<div class="delta">(+${delta.toFixed(3)}s)</div>` : ""}
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById("leaderboard").style.display = "table";
+    });
+}
+</script>
 
 </body>
 </html>

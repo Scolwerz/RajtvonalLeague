@@ -13,7 +13,7 @@ body {
   text-align: center;
 }
 
-/* Felső glow */
+/* Header glow */
 .header {
   position: relative;
   padding: 60px 20px 20px;
@@ -27,8 +27,8 @@ body {
   transform: translateX(-50%);
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(180,0,0,0.3) 0%, transparent 70%);
-  filter: blur(60px);
+  background: radial-gradient(circle, rgba(180,0,0,0.25) 0%, transparent 70%);
+  filter: blur(80px);
   z-index: 0;
 }
 
@@ -52,17 +52,18 @@ h1 {
 }
 
 button {
-  background: #0d1117;
+  background: #0b1220; /* sötét kékes-fekete */
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 22px;
   margin: 5px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: bold;
 }
 
 button.active {
-  background: #b30000;
+  background: #b30000; /* piros */
 }
 
 /* Tábla */
@@ -74,7 +75,7 @@ table {
 }
 
 th {
-  background: #0d1117;
+  background: #0b1220;
   padding: 10px;
 }
 
@@ -83,14 +84,14 @@ td {
 }
 
 tr:nth-child(even) {
-  background: #101722;
+  background: #101a2a;
 }
 
 tr:nth-child(odd) {
-  background: #0c111a;
+  background: #0c1422;
 }
 
-/* Színezések */
+/* Színek */
 .rank {
   font-weight: bold;
   color: white;
@@ -106,7 +107,7 @@ tr:nth-child(odd) {
 }
 
 .time {
-  color: #cccccc;
+  color: #d0d0d0;
 }
 
 .total {
@@ -142,7 +143,7 @@ tr:nth-child(odd) {
   </div>
 </div>
 
-<table id="leaderboard" style="display:none;">
+<table id="leaderboard">
   <thead>
     <tr>
       <th>#</th>
@@ -153,11 +154,13 @@ tr:nth-child(odd) {
       <th>Összidő</th>
     </tr>
   </thead>
-  <tbody></tbody>
+  <tbody>
+    <!-- Üres kezdetben -->
+  </tbody>
 </table>
 
 <div class="footer">
-  Utolsó módosítás: 2026. 04. 25 | 21:05
+  2026. 04. 25 | 21:05
 </div>
 
 <script>
@@ -173,6 +176,7 @@ function formatTime(s) {
 }
 
 function loadData(file, btn) {
+  // aktív gomb
   document.querySelectorAll("button").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
 
@@ -194,21 +198,16 @@ function loadData(file, btn) {
 
       data.sort((a,b) => a.total - b.total);
 
-      let best = data[0].total;
+      let best = data[0]?.total || 0;
 
       let tbody = document.querySelector("#leaderboard tbody");
       tbody.innerHTML = "";
 
       data.forEach((d, i) => {
-        let tr = document.createElement("tr");
-
-        let rankClass = "";
-        if (i === 0) rankClass = "gold";
-        else if (i === 1) rankClass = "silver";
-        else if (i === 2) rankClass = "bronze";
-
+        let rankClass = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
         let delta = d.total - best;
 
+        let tr = document.createElement("tr");
         tr.innerHTML = `
           <td class="rank ${rankClass}">${i+1}</td>
           <td class="name">${d.name}</td>
@@ -220,11 +219,8 @@ function loadData(file, btn) {
             ${i !== 0 ? `<div class="delta">(+${delta.toFixed(3)}s)</div>` : ""}
           </td>
         `;
-
         tbody.appendChild(tr);
       });
-
-      document.getElementById("leaderboard").style.display = "table";
     });
 }
 </script>

@@ -6,7 +6,7 @@ PARTICIPANTS = 20
 MAX_BOP = 10 #kg
 
 TOTAL_RACES = 12
-MAX_POINTS_PER_RACE = 16 #15-12-10-8-6-5-4-3-2-1   +1 pole
+MAX_POINTS_PER_RACE = 27  #16 #15-12-10-8-6-5-4-3-2-1   +1 pole
 
 SZEZON = {
     1:  "Bahrain",
@@ -63,6 +63,7 @@ track_type_map = {
     }
 
 
+
 class Driver:
     def __init__(self, name, results, position, points):
         self.name = name
@@ -90,6 +91,7 @@ def load_drivers( file_path = 'C:\\Users\\Dani\\Desktop\\RAJTVONAL_LEAGUE\\input
     with open(file_path, newline='', encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
+
             rows_done += 1
             if rows_done > PARTICIPANTS + 5: break
 
@@ -106,7 +108,8 @@ def load_drivers( file_path = 'C:\\Users\\Dani\\Desktop\\RAJTVONAL_LEAGUE\\input
 
             try:
                 points = int(row[15])
-            except: continue
+            except:
+                continue
 
             drivers.append(Driver(name, results, position, points))
 
@@ -192,9 +195,14 @@ def calculate_bop(position=1, point=0, leader_points=0, current_race=1, top3_res
     bop = max(0, min(MAX_BOP, bop))
     return bop
 
+
 if __name__ == '__main__':
+
+    #print(calculate_bop(1, 11, 15, 3, 11))
+
     drivers = load_drivers('C:\\Users\\Dani\\Desktop\\RAJTVONAL_LEAGUE\\input.csv')
-    current_race = 13
+    current_race = 12
     
     bops = calculate_all_bops(drivers, current_race)
     save_bops(bops, 'C:\\Users\\Dani\\Desktop\\RAJTVONAL_LEAGUE\\BOPs.txt')
+

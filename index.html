@@ -27,7 +27,7 @@ body {
   color: var(--text-primary);
 }
 
-/* 🔴 Glow háttér */
+/* Glow */
 .bg-glow {
   position: fixed;
   top: -200px;
@@ -60,7 +60,7 @@ body {
 }
 
 .subtitle {
-  margin-top: 5px;
+  margin-top: 20px;
   letter-spacing: 0.4em;
   font-size: 12px;
   color: var(--text-secondary);
@@ -68,17 +68,18 @@ body {
 
 /* GOMBOK */
 .buttons {
-  margin-top: 25px;
+  margin-top: 30px;
 }
 
 button {
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   color: white;
-  padding: 10px 18px;
-  margin: 5px;
-  border-radius: 6px;
-  font-weight: 700;
+  padding: 15px 27px;
+  margin: 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 800;
   cursor: pointer;
   transition: 0.2s;
 }
@@ -92,7 +93,9 @@ button.active {
   border-color: var(--red);
 }
 
+
 /* TOP 3 */
+<!--
 .top3 {
   display: flex;
   justify-content: center;
@@ -117,6 +120,9 @@ button.active {
 .card h2 { margin: 0; }
 .card .name { font-weight: 700; margin: 5px 0; }
 .card .time { color: var(--yellow); font-weight: 700; }
+-->
+
+
 
 /* TÁBLA */
 .wrapper {
@@ -149,6 +155,23 @@ td {
 
 tr:nth-child(even) { background: var(--bg-row-alt); }
 
+/* TOP 3 highlight */
+tr:hover {
+tr.top1 {
+  background: rgba(255,215,0,0.08);
+  border-left: 3px solid gold;
+}
+tr.top2 {
+  background: #1a1a3a;
+  background: rgba(192,192,192,0.08);
+  border-left: 3px solid silver;
+}
+tr.top3 {
+  background: rgba(205,127,50,0.08);
+  border-left: 3px solid #cd7f32;
+}
+}
+
 tr:hover {
   background: #1a1a3a;
 }
@@ -158,7 +181,10 @@ tr:hover {
 .rank-2 { color: silver; }
 .rank-3 { color: #cd7f32; }
 
-.name { font-weight: 700; text-align: left; }
+.name {
+  font-weight: 700;
+  text-align: left;
+}
 
 .time { color: var(--text-secondary); }
 
@@ -206,8 +232,6 @@ tr:hover {
   </div>
 </div>
 
-<div class="top3" id="top3"></div>
-
 <div class="wrapper">
 <table>
 <thead>
@@ -245,15 +269,34 @@ function loadData(file,btn){
  fetch(file+"?v="+Date.now())
  .then(r=>r.text())
  .then(t=>{
-  let data=t.trim().split("\n").map(r=>{
-   let [n,a,b,c]=r.split(",");
-   a=parseTime(a);b=parseTime(b);c=parseTime(c);
-   return {n,a,b,c,total:a+b+c};
+  let rows=t.trim().split("\n").map(r=>r.split(","));
+
+  // pálya helyezések kiszámolása
+  let ranks=[[],[],[]];
+  for(let i=1;i<=3;i++){
+    let sorted=[...rows].sort((a,b)=>parseTime(a[i])-parseTime(b[i]));
+    sorted.forEach((r,idx)=>{
+      let name=r[0];
+      if(!ranks[i-1]) ranks[i-1]={};
+      ranks[i-1][name]=idx+1;
+    });
+  }
+  let data=rows.map(r=>{
+   let a=parseTime(r[1]);
+   let b=parseTime(r[2]);
+   let c=parseTime(r[3]);
+   return {
+    n:r[0],a,b,c,
+    ra:ranks[0][r[0]],
+    rb:ranks[1][r[0]],
+    rc:ranks[2][r[0]],
+    total:a+b+c
+   };
   });
 
   data.sort((x,y)=>x.total-y.total);
 
-  renderTop3(data);
+  /* renderTop3(data); */
   renderTable(data);
  });
 }
@@ -279,15 +322,21 @@ function renderTable(d){
 
  d.forEach((x,i)=>{
   let tr=document.createElement("tr");
-  tr.className="row";
+
+  if(i===0) tr.classList.add("top1");
+  if(i===1) tr.classList.add("top2");
+  if(i===2) tr.classList.add("top3");
+
   let delta=i?`<div class="delta">(+${(x.total-best).toFixed(3)}s)</div>`:"";
-  tr.innerHTML=`
+
+   tr.innerHTML=`
   <td class="rank-${i+1}">${i+1}</td>
   <td class="name">${x.n}</td>
-  <td class="time">${fmt(x.a)}</td>
-  <td class="time">${fmt(x.b)}</td>
-  <td class="time">${fmt(x.c)}</td>
-  <td class="total">${fmt(x.total)}${delta}</td>`;
+  <td class="time"><span class="map-rank">(${x.ra})</span>${fmt(x.a)}</td>
+  <td class="time"><span class="map-rank">(${x.rb})</span>${fmt(x.b)}</td>
+  <td class="time"><span class="map-rank">(${x.rc})</span>${fmt(x.c)}</td>
+  <td class="total">${fmt(x.total)}${delta}</td>
+  `;
   t.appendChild(tr);
  });
 }

@@ -1,2 +1,1 @@
-# RajtvonalLeague
-A Rajtvonal F1 és LMU ligáihoz tartozó kódok, és egyéb fájlok
+# THIS REPO IS MIGRATED TO https://github.com/rajtvonal/F1_Challenge and https://github.com/rajtvonal/SimMasters

@@ -2,226 +2,288 @@
 <html lang="hu">
 <head>
 <meta charset="UTF-8">
-<title>Rajtvonal Előkvalifikáció</title>
+<title>F1Challenge Results</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
 <style>
+/* --- UGYANAZ A STÍLUS --- */
+:root {
+  --bg-primary: #0a0a12;
+  --bg-secondary: #10101e;
+  --bg-row: #12122a;
+  --bg-row-alt: #0e0e22;
+  --red: #db0a40;
+  --red-glow: rgba(219,10,64,0.3);
+  --yellow: #ffc906;
+  --text-primary: #f0f0f5;
+  --text-secondary: #8888aa;
+  --border: #1e1e3a;
+}
+
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0a0a0a;
-  color: white;
-  text-align: center;
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
-/* Header glow */
-.header {
-  position: relative;
-  padding: 60px 20px 20px;
-}
-
-.header::before {
-  content: "";
-  position: absolute;
-  top: -500px;
+/* Glow */
+.bg-glow {
+  position: fixed;
+  top: -200px;
   left: 50%;
   transform: translateX(-50%);
-  width: 1000px;
-  height: 1000px;
-  background: radial-gradient(circle, rgba(195,0,0,0.25) 0%, transparent 60%);
-  filter: blur(80px);
+  width: 800px;
+  height: 500px;
+  background: radial-gradient(ellipse, var(--red-glow) 0%, transparent 70%);
   z-index: 0;
 }
 
-h1 {
+/* HEADER */
+.header {
   position: relative;
   z-index: 1;
-  font-weight: bold;
+  text-align: center;
+  padding: 60px 20px 20px;
 }
 
-.title-red {
-  color: #b30000;
+.title {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: var(--red);
+  text-transform: uppercase;
 }
 
-.title-white {
-  color: white;
+.title span {
+  color: var(--text-primary);
+  text-shadow: 0 0 40px var(--red-glow);
 }
 
-/* Gombok */
-.buttons {
+.subtitle {
   margin-top: 20px;
+  letter-spacing: 0.4em;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.buttons {
+  margin-top: 30px;
 }
 
 button {
-  background: #091b3d; /* sötét kékes-fekete */
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   color: white;
-  border: none;
-  padding: 12px 22px;
+  padding: 15px 27px;
   margin: 20px;
   border-radius: 8px;
+  font-size: 16px;
+  font-weight: 800;
   cursor: pointer;
-  font-weight: bold;
+  transition: 0.2s;
+}
+
+button:hover {
+  border-color: var(--red);
 }
 
 button.active {
-  background: #b30000; /* piros */
+  background: var(--red);
+  border-color: var(--red);
 }
 
-/* Tábla */
+.wrapper {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
 table {
-  margin: 30px auto;
+  width: 100%;
   border-collapse: collapse;
-  width: 80%;
-  max-width: 900px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
 }
 
 th {
-  background: #0b1220;
-  padding: 10px;
+  background: var(--bg-primary);
+  padding: 12px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  border-bottom: 2px solid var(--red);
 }
 
 td {
-  padding: 10px;
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
 }
 
-tr:nth-child(even) {
-  background: #101a2a;
+tr:nth-child(even) { background: var(--bg-row-alt); }
+
+tr:hover {
+tr.top1 {
+  background: rgba(255,215,0,0.08);
+  border-left: 3px solid gold;
+}
+tr.top2 {
+  background: #1a1a3a;
+  background: rgba(192,192,192,0.08);
+  border-left: 3px solid silver;
+}
+tr.top3 {
+  background: rgba(205,127,50,0.08);
+  border-left: 3px solid #cd7f32;
+}
 }
 
-tr:nth-child(odd) {
-  background: #0c1422;
+tr:hover {
+  background: #1a1a3a;
 }
 
 /* Színek */
-.rank {
-  font-weight: bold;
-  color: white;
-}
-
-.gold { color: gold; }
-.silver { color: silver; }
-.bronze { color: #cd7f32; }
+.rank-1 { color: gold; font-weight: 900; }
+.rank-2 { color: silver; }
+.rank-3 { color: #cd7f32; }
 
 .name {
-  font-weight: bold;
-  color: white;
+  font-weight: 700;
+  text-align: left;
 }
 
-.time {
-  color: #d0d0d0;
+
+/* Animáció */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.total {
-  color: #ffd700;
-  font-weight: bold;
+.row {
+  animation: fadeUp 0.3s ease forwards;
 }
 
-.delta {
-  color: #ff2e2ea6;
-  font-size: 12px;
-}
-
-/* Footer */
 .footer {
-  margin-top: 50px;
+  text-align: center;
   font-size: 10px;
-  color: #777;
+  margin: 40px 0;
+  color: var(--text-secondary);
 }
 </style>
 </head>
 
 <body>
 
+<div class="bg-glow"></div>
+
 <div class="header">
-  <h1>
-    <span class="title-red">Rajtvonal</span>
-    <span class="title-white"> Előkvalifikáció</span>
-  </h1>
+  <div class="title">F1Challenge <span>Eredmények</span></div>
+  <div class="subtitle">LEADERBOARD</div>
 
   <div class="buttons">
-    <button onclick="loadData('f1challenge.csv', this)">F1 Challenge (F1 23)</button>
-    <button onclick="loadData('simmasters.csv', this)">Sim Masters (LMU)</button>
+    <button id="defaultBtn" onclick="loadResults(this)">Main</button>
+    <button>Egyéni</button>
+    <button>Konstruktőri</button>
+    <button>Statisztikák</button>
+    <button>Versenyek</button>
   </div>
 </div>
 
-<table id="leaderboard">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Név</th>
-      <th>Pálya1</th>
-      <th>Pálya2</th>
-      <th>Pálya3</th>
-      <th>Összidő</th>
-    </tr>
-  </thead>
-  <tbody>
-    <!-- Üres kezdetben -->
-  </tbody>
+<div class="wrapper">
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Név</th>
+<th>Csapat</th>
+<th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>R5</th><th>R6</th>
+<th>R7</th><th>R8</th><th>R9</th><th>R10</th><th>R11</th><th>R12</th>
+<th>Pont</th>
+<th>Gain</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
 </table>
-
-<div class="footer">
-  Utolsó módosítás: 2026. 04. 25 | 21:40
 </div>
 
+<div class="footer">2026. 04. 25 | 21:05</div>
+
 <script>
-function parseTime(t) {
-  let [min, sec] = t.split(":");
-  return parseFloat(min) * 60 + parseFloat(sec);
-}
+let pointsMap = {};
 
-function formatTime(s) {
-  let min = Math.floor(s / 60);
-  let sec = (s % 60).toFixed(3).padStart(6, '0');
-  return `${min}:${sec}`;
-}
-
-function loadData(file, btn) {
-  document.querySelectorAll("button").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
-
-  fetch(file)
-    .then(res => res.text())
-    .then(text => {
-      let rows = text.trim().split("\n").map(r => r.split(","));
-
-      let data = rows.map(r => {
-        let t1 = parseTime(r[1]);
-        let t2 = parseTime(r[2]);
-        let t3 = parseTime(r[3]);
-        return {
-          name: r[0],
-          t1, t2, t3,
-          total: t1 + t2 + t3
-        };
-      });
-
-      data.sort((a,b) => a.total - b.total);
-
-      let best = data[0]?.total || 0;
-
-      let tbody = document.querySelector("#leaderboard tbody");
-      tbody.innerHTML = "";
-
-      data.forEach((d, i) => {
-        let rankClass = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
-        let delta = d.total - best;
-
-        let tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="rank ${rankClass}">${i+1}</td>
-          <td class="name">${d.name}</td>
-          <td class="time">${formatTime(d.t1)}</td>
-          <td class="time">${formatTime(d.t2)}</td>
-          <td class="time">${formatTime(d.t3)}</td>
-          <td class="total">
-            ${formatTime(d.total)}
-            ${i !== 0 ? `<div class="delta">(+${delta.toFixed(3)}s)</div>` : ""}
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
+function loadPoints(){
+ return fetch("pontrendszer.csv")
+  .then(r=>r.text())
+  .then(t=>{
+    t.trim().split("\n").forEach(line=>{
+      let [pos, pts] = line.split(",");
+      pointsMap[pos.trim()] = parseInt(pts);
     });
+  });
 }
+
+function loadResults(){
+ document.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
+ btn.classList.add("active");
+
+ fetch("F1Challenge_results.csv")
+ .then(r=>r.text())
+ .then(t=>{
+   let data = t.trim().split("\n").map(r=>{
+     let cols = r.split(",");
+     let name = cols[0];
+     let team = cols[1];
+     let results = cols.slice(2,14);
+
+     let total = 0;
+
+     results.forEach(res=>{
+       if(res === "" || res === undefined) return;
+       total += pointsMap[res] ?? 0;
+     });
+
+     return {name, team, results, total};
+   });
+
+   data.sort((a,b)=>b.total-a.total);
+
+   renderTable(data);
+ });
+}
+
+function renderTable(data){
+ let tbody = document.getElementById("tbody");
+ tbody.innerHTML="";
+
+ data.forEach((d,i)=>{
+   let tr = document.createElement("tr");
+   tr.className="row";
+   let rankClass = i<3 ? `rank-${i+1}` : "";
+
+   let races = "";
+   for(let j=0;j<12;j++){
+     races += `<td>${d.results[j] || "-"}</td>`;
+   }
+
+   tr.innerHTML = `
+   <td class="${rankClass}">${i+1}</td>
+   <td class="name"><img src="https://flagcdn.com/w20/hu.png" style="vertical-align:middle;margin-right:6px;">${d.name}</td>
+   <td>${d.team}</td>
+   ${races}
+   <td>${d.total}</td>
+   <td>0</td>
+   `;
+
+   tbody.appendChild(tr);
+ });
+}
+
+window.onload = async ()=>{
+ await loadPoints();
+ loadResults();
+};
 </script>
 
 </body>

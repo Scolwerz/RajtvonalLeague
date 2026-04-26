@@ -183,7 +183,7 @@ tr:hover {
   <div class="subtitle">EREDMÉNYEK</div>
 
   <div class="buttons">
-    <button class="active" onclick="loadResults(this)">Main</button>
+    <button id="defaultBtn" class="active" onclick="loadResults(this)">Main</button>
     <button>Egyéni</button>
     <button>Konstruktőri</button>
     <button>Statisztikák</button>
@@ -224,9 +224,9 @@ function loadPoints(){
   });
 }
 
-function loadResults(){
+function loadResults(btn){
  document.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
- btn.classList.add("active");
+ if(btn) btn.classList.add("active");
 
  fetch("F1Challenge_results.csv")
  .then(r=>r.text())
@@ -241,7 +241,7 @@ function loadResults(){
 
      results.forEach(res=>{
        if(res === "" || res === undefined) return;
-       total += pointsMap[res] ?? 0;
+       total += pointsMap[res?.trim()] ?? 0;
      });
 
      return {name, team, results, total};
@@ -282,7 +282,7 @@ function renderTable(data){
 
 window.onload = async ()=>{
  await loadPoints();
- loadResults();
+ loadResults(document.getElementById("defaultBtn"));
 };
 </script>
 

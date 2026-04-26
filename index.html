@@ -269,29 +269,10 @@ function loadData(file,btn){
  fetch(file+"?v="+Date.now())
  .then(r=>r.text())
  .then(t=>{
-  let rows=t.trim().split("\n").map(r=>r.split(","));
-
-  // pálya helyezések kiszámolása
-  let ranks=[[],[],[]];
-  for(let i=1;i<=3;i++){
-    let sorted=[...rows].sort((a,b)=>parseTime(a[i])-parseTime(b[i]));
-    sorted.forEach((r,idx)=>{
-      let name=r[0];
-      if(!ranks[i-1]) ranks[i-1]={};
-      ranks[i-1][name]=idx+1;
-    });
-  }
-  let data=rows.map(r=>{
-   let a=parseTime(r[1]);
-   let b=parseTime(r[2]);
-   let c=parseTime(r[3]);
-   return {
-    n:r[0],a,b,c,
-    ra:ranks[0][r[0]],
-    rb:ranks[1][r[0]],
-    rc:ranks[2][r[0]],
-    total:a+b+c
-   };
+  let data=t.trim().split("\n").map(r=>{
+   let [n,a,b,c]=r.split(",");
+   a=parseTime(a);b=parseTime(b);c=parseTime(c);
+   return {n,a,b,c,total:a+b+c};
   });
 
   data.sort((x,y)=>x.total-y.total);
@@ -322,21 +303,15 @@ function renderTable(d){
 
  d.forEach((x,i)=>{
   let tr=document.createElement("tr");
-
-  if(i===0) tr.classList.add("top1");
-  if(i===1) tr.classList.add("top2");
-  if(i===2) tr.classList.add("top3");
-
+  tr.className="row";
   let delta=i?`<div class="delta">(+${(x.total-best).toFixed(3)}s)</div>`:"";
-
-   tr.innerHTML=`
+  tr.innerHTML=`
   <td class="rank-${i+1}">${i+1}</td>
   <td class="name">${x.n}</td>
-  <td class="time"><span class="map-rank">(${x.ra})</span>${fmt(x.a)}</td>
-  <td class="time"><span class="map-rank">(${x.rb})</span>${fmt(x.b)}</td>
-  <td class="time"><span class="map-rank">(${x.rc})</span>${fmt(x.c)}</td>
-  <td class="total">${fmt(x.total)}${delta}</td>
-  `;
+  <td class="time">${fmt(x.a)}</td>
+  <td class="time">${fmt(x.b)}</td>
+  <td class="time">${fmt(x.c)}</td>
+  <td class="total">${fmt(x.total)}${delta}</td>`;
   t.appendChild(tr);
  });
 }

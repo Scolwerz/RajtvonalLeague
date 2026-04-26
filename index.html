@@ -307,8 +307,7 @@ function renderTable(d){
   let delta=i?`<div class="delta">(+${(x.total-best).toFixed(3)}s)</div>`:"";
   tr.innerHTML=`
   <td class="rank-${i+1}">${i+1}</td>
-  <td class="name">🇭🇺 ${x.n}</td>
-  <td class="time">${fmt(x.a)}</td>
+  <td class="name"><img src="https://flagcdn.com/w20/hu.png" style="vertical-align:middle;margin-right:6px;">${x.n}</td>  <td class="time">${fmt(x.a)}</td>
   <td class="time">${fmt(x.b)}</td>
   <td class="time">${fmt(x.c)}</td>
   <td class="total">${fmt(x.total)}${delta}</td>`;

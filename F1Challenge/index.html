@@ -184,11 +184,12 @@ tr:hover {
 
   <div class="buttons">
     <button id="defaultBtn" class="active" onclick="loadResults(this)">Main</button>
-    <button>Egyéni</button>
-    <button>Konstruktőri</button>
+    <button onclick="showIndividual(this)">Egyéni</button>
+    <button onclick="showTeams(this)">Konstruktőri</button>
     <button>Statisztikák</button>
-    <button>Versenyek</button>
+    <button onclick="showRaces(this)">Versenyek</button>
   </div>
+  <div id="raceButtons" style="display:none; margin-top:20px;"></div>
 </div>
 
 <div class="wrapper">
@@ -208,10 +209,25 @@ tr:hover {
 </table>
 </div>
 
-<div class="footer">2026. 04. 25 | 21:05</div>
+<div class="footer">Utolsó módosítás: 2026. 04. 26. | 18:02</div>
 
 <script>
 let pointsMap = {};
+let currentData = [];
+
+function setActive(btn){
+ document.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
+ btn.classList.add("active");
+}
+
+function hideRaceButtons(){
+ document.getElementById("raceButtons").style.display="none";
+}
+
+function updateHeader(cols){
+ let tr=document.querySelector("thead tr");
+ tr.innerHTML = cols.map(c=>`<th>${c}</th>`).join("");
+}
 
 function loadPoints(){
  return fetch("pontrendszer.csv")
@@ -225,8 +241,7 @@ function loadPoints(){
 }
 
 function loadResults(btn){
- document.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
- if(btn) btn.classList.add("active");
+ setActive(btn);
 
  fetch("F1Challenge_results.csv")
  .then(r=>r.text())
@@ -249,11 +264,14 @@ function loadResults(btn){
 
    data.sort((a,b)=>b.total-a.total);
 
-   renderTable(data);
+   currentData = data;
+   renderTable(data,"main");
+   hideRaceButtons();
+   updateHeader(["#","Név","Csapat","R1","R2","R3","R4","R5","R6","R7","R8","R9","R10","R11","R12","Pont","Gain"]);
  });
 }
 
-function renderTable(data){
+function renderTable(data, mode="main"){
  let tbody = document.getElementById("tbody");
  tbody.innerHTML="";
 
@@ -262,22 +280,135 @@ function renderTable(data){
    /* tr.className="row"; */
    let rankClass = i<3 ? `rank-${i+1}` : "";
 
-   let races = "";
-   for(let j=0;j<12;j++){
-     races += `<td>${d.results[j] || "-"}</td>`;
+   if (mode === "main"){
+    let races = "";
+    for(let j=0;j<12;j++){
+      races += `<td>${d.results[j] || "-"}</td>`;
+    }
+
+    tr.innerHTML = `
+    <td class="${rankClass}">${i+1}</td>
+    <td class="name"><img src="https://flagcdn.com/w20/hu.png" style="vertical-align:middle;margin-right:6px;">${d.name}</td>
+    <td>${d.team}</td>
+    ${races}
+    <td>${d.total}</td>
+    <td>0</td>
+    `;
+  }
+
+  if(mode === "individual"){
+     tr.innerHTML = `
+     <td class="${rankClass}">${i+1}</td>
+     <td class="name"><img src="https://flagcdn.com/w20/hu.png" style="margin-right:6px;">${d.name}</td>
+     <td>${d.team}</td>
+     <td>${d.total}</td>
+     <td>0</td>`;
    }
 
-   tr.innerHTML = `
-   <td class="${rankClass}">${i+1}</td>
-   <td class="name"><img src="https://flagcdn.com/w20/hu.png" style="vertical-align:middle;margin-right:6px;">${d.name}</td>
-   <td>${d.team}</td>
-   ${races}
-   <td>${d.total}</td>
-   <td>0</td>
+    tbody.appendChild(tr);
+ });
+}
+
+function showIndividual(btn){
+ setActive(btn);
+ hideRaceButtons();
+
+ let sorted = [...currentData].sort((a,b)=>b.total-a.total);
+ renderTable(sorted,"individual");
+
+ updateHeader(["#","Név","Csapat","Pont","Gain"]);
+}
+
+function showTeams(btn){
+ setActive(btn);
+
+ hideRaceButtons();
+
+ let teams = {};
+
+ currentData.forEach(d=>{
+   if(!teams[d.team]){
+     teams[d.team] = {players:[], total:0};
+   }
+   teams[d.team].players.push(d.name);
+   teams[d.team].total += d.total;
+ });
+
+ let arr = Object.entries(teams).map(([team,data])=>({
+   team,
+   players:data.players,
+   total:data.total
+ }));
+
+ arr.sort((a,b)=>b.total-a.total);
+
+ let tbody = document.getElementById("tbody");
+ tbody.innerHTML="";
+
+ arr.forEach((t,i)=>{
+   let tr=document.createElement("tr");
+
+   tr.innerHTML=`
+   <td>${i+1}</td>
+   <td>${t.team}</td>
+   <td style="text-align:left">${t.players.join("<br>")}</td>
+   <td>${t.total}</td>
    `;
 
    tbody.appendChild(tr);
  });
+
+ updateHeader(["#","Csapat","Pilóták","Pont"]);
+}
+
+function showRaces(btn){
+ setActive(btn);
+ showRaceButtons();
+}
+
+function showRaceButtons(){
+ let div=document.getElementById("raceButtons");
+ div.style.display="block";
+ div.innerHTML="";
+
+ for(let i=0;i<12;i++){
+   let b=document.createElement("button");
+   b.innerText="R"+(i+1);
+
+   b.onclick=()=>{
+     let data=[...currentData].map(d=>{
+       return {
+         name:d.name,
+         team:d.team,
+         pos:d.results[i]
+       };
+     });
+
+     data.sort((a,b)=>{
+       if(!a.pos) return 1;
+       if(!b.pos) return -1;
+       return a.pos-b.pos;
+     });
+
+     let tbody=document.getElementById("tbody");
+     tbody.innerHTML="";
+
+     data.forEach((d,i)=>{
+       let tr=document.createElement("tr");
+       tr.innerHTML=`
+       <td>${i+1}</td>
+       <td class="name">${d.name}</td>
+       <td>${d.team}</td>
+       <td>${d.pos || "-"}</td>
+       `;
+       tbody.appendChild(tr);
+     });
+
+     updateHeader(["#","Név","Csapat","Pozíció"]);
+   };
+
+   div.appendChild(b);
+ }
 }
 
 window.onload = async ()=>{

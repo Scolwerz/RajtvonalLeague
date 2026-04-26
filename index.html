@@ -13,7 +13,7 @@ body {
   text-align: center;
 }
 
-/* Header glow */
+/* HEADER + GLOW */
 .header {
   position: relative;
   padding: 60px 20px 20px;
@@ -22,14 +22,13 @@ body {
 .header::before {
   content: "";
   position: absolute;
-  top: -500px;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 1000px;
-  height: 1000px;
-  background: radial-gradient(circle, rgba(195,0,0,0.25) 0%, transparent 60%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(180,0,0,0.25) 0%, transparent 70%);
   filter: blur(80px);
-  z-index: 0;
 }
 
 h1 {
@@ -38,35 +37,55 @@ h1 {
   font-weight: bold;
 }
 
-.title-red {
-  color: #b30000;
-}
+.title-red { color: #b30000; }
+.title-white { color: white; }
 
-.title-white {
-  color: white;
-}
-
-/* Gombok */
-.buttons {
-  margin-top: 20px;
-}
+/* GOMBOK */
+.buttons { margin-top: 20px; }
 
 button {
-  background: #091b3d; /* sötét kékes-fekete */
+  background: #0b1220;
   color: white;
   border: none;
   padding: 12px 22px;
-  margin: 20px;
+  margin: 5px;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
+  transition: 0.2s;
 }
 
 button.active {
-  background: #b30000; /* piros */
+  background: #b30000;
 }
 
-/* Tábla */
+/* TOP 3 BLOKK */
+.top3 {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.card {
+  background: #0b1220;
+  padding: 20px;
+  border-radius: 12px;
+  width: 180px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.6s forwards;
+}
+
+.card.gold { border: 2px solid gold; }
+.card.silver { border: 2px solid silver; }
+.card.bronze { border: 2px solid #cd7f32; }
+
+.card h2 { margin: 5px 0; }
+.card .name { font-weight: bold; }
+.card .time { color: #ffd700; }
+
+/* TÁBLA */
 table {
   margin: 30px auto;
   border-collapse: collapse;
@@ -79,36 +98,33 @@ th {
   padding: 10px;
 }
 
-td {
-  padding: 10px;
+td { padding: 10px; }
+
+tr:nth-child(even) { background: #101a2a; }
+tr:nth-child(odd) { background: #0c1422; }
+
+/* ANIMÁCIÓ */
+.row {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 0.4s forwards;
 }
 
-tr:nth-child(even) {
-  background: #101a2a;
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-tr:nth-child(odd) {
-  background: #0c1422;
-}
+/* SZÍNEK */
+.rank { font-weight: bold; color: white; }
+.goldText { color: gold; }
+.silverText { color: silver; }
+.bronzeText { color: #cd7f32; }
 
-/* Színek */
-.rank {
-  font-weight: bold;
-  color: white;
-}
-
-.gold { color: gold; }
-.silver { color: silver; }
-.bronze { color: #cd7f32; }
-
-.name {
-  font-weight: bold;
-  color: white;
-}
-
-.time {
-  color: #d0d0d0;
-}
+.name { font-weight: bold; }
+.time { color: #d0d0d0; }
 
 .total {
   color: #ffd700;
@@ -116,11 +132,11 @@ tr:nth-child(odd) {
 }
 
 .delta {
-  color: #ff2e2ea6;
+  color: #ff4d4d;
   font-size: 12px;
 }
 
-/* Footer */
+/* FOOTER */
 .footer {
   margin-top: 50px;
   font-size: 10px;
@@ -138,30 +154,32 @@ tr:nth-child(odd) {
   </h1>
 
   <div class="buttons">
-    <button onclick="loadData('f1challenge.csv', this)">F1 Challenge (F1 23)</button>
-    <button onclick="loadData('simmasters.csv', this)">Sim Masters (LMU)</button>
+    <button id="defaultBtn" onclick="loadData('f1challenge.csv', this)">
+      F1 Challenge (F1 23)
+    </button>
+    <button onclick="loadData('simmasters.csv', this)">
+      Sim Masters (LMU)
+    </button>
   </div>
 </div>
 
+<div class="top3" id="top3"></div>
+
 <table id="leaderboard">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Név</th>
-      <th>Pálya1</th>
-      <th>Pálya2</th>
-      <th>Pálya3</th>
-      <th>Összidő</th>
-    </tr>
-  </thead>
-  <tbody>
-    <!-- Üres kezdetben -->
-  </tbody>
+<thead>
+<tr>
+<th>#</th>
+<th>Név</th>
+<th>Pálya1</th>
+<th>Pálya2</th>
+<th>Pálya3</th>
+<th>Összidő</th>
+</tr>
+</thead>
+<tbody></tbody>
 </table>
 
-<div class="footer">
-  Utolsó módosítás: 2026. 04. 25 | 21:40
-</div>
+<div class="footer">2026. 04. 25 | 21:05</div>
 
 <script>
 function parseTime(t) {
@@ -179,7 +197,7 @@ function loadData(file, btn) {
   document.querySelectorAll("button").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
 
-  fetch(file)
+  fetch(file + "?v=" + Date.now())
     .then(res => res.text())
     .then(text => {
       let rows = text.trim().split("\n").map(r => r.split(","));
@@ -197,31 +215,71 @@ function loadData(file, btn) {
 
       data.sort((a,b) => a.total - b.total);
 
-      let best = data[0]?.total || 0;
-
-      let tbody = document.querySelector("#leaderboard tbody");
-      tbody.innerHTML = "";
-
-      data.forEach((d, i) => {
-        let rankClass = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
-        let delta = d.total - best;
-
-        let tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="rank ${rankClass}">${i+1}</td>
-          <td class="name">${d.name}</td>
-          <td class="time">${formatTime(d.t1)}</td>
-          <td class="time">${formatTime(d.t2)}</td>
-          <td class="time">${formatTime(d.t3)}</td>
-          <td class="total">
-            ${formatTime(d.total)}
-            ${i !== 0 ? `<div class="delta">(+${delta.toFixed(3)}s)</div>` : ""}
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
+      renderTop3(data);
+      renderTable(data);
     });
 }
+
+function renderTop3(data) {
+  const container = document.getElementById("top3");
+  container.innerHTML = "";
+
+  const classes = ["gold","silver","bronze"];
+
+  data.slice(0,3).forEach((d,i) => {
+    let div = document.createElement("div");
+    div.className = "card " + classes[i];
+    div.style.animationDelay = (i * 0.2) + "s";
+
+    div.innerHTML = `
+      <h2>#${i+1}</h2>
+      <div class="name">${d.name}</div>
+      <div class="time">${formatTime(d.total)}</div>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+function renderTable(data) {
+  let tbody = document.querySelector("#leaderboard tbody");
+  tbody.innerHTML = "";
+
+  let best = data[0]?.total || 0;
+
+  data.forEach((d,i) => {
+    let rankColor =
+      i===0 ? "goldText" :
+      i===1 ? "silverText" :
+      i===2 ? "bronzeText" : "";
+
+    let delta = d.total - best;
+
+    let tr = document.createElement("tr");
+    tr.className = "row";
+    tr.style.animationDelay = (i * 0.05) + "s";
+
+    tr.innerHTML = `
+      <td class="rank ${rankColor}">${i+1}</td>
+      <td class="name">${d.name}</td>
+      <td class="time">${formatTime(d.t1)}</td>
+      <td class="time">${formatTime(d.t2)}</td>
+      <td class="time">${formatTime(d.t3)}</td>
+      <td class="total">
+        ${formatTime(d.total)}
+        ${i !== 0 ? `<div class="delta">(+${delta.toFixed(3)}s)</div>` : ""}
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+/* AUTO LOAD */
+window.onload = function() {
+  const btn = document.getElementById("defaultBtn");
+  loadData('f1challenge.csv', btn);
+};
 </script>
 
 </body>

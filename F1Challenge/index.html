@@ -133,19 +133,26 @@ tr:nth-child(odd) {
 
 <div class="header">
   <h1>
-    <span class="title-white">Rajtvonal</span>
-    <span class="title-red">F1 Challenge</span>
+    <span class="title-red">Rajtvonal</span>
     <span class="title-white"> Előkvalifikáció</span>
   </h1>
 
   <div class="buttons">
     <button onclick="loadData('f1challenge.csv', this)">F1 Challenge (F1 23)</button>
+    <button onclick="loadData('simmasters.csv', this)">Sim Masters (LMU)</button>
   </div>
 </div>
 
 <table id="leaderboard">
   <thead>
-    
+    <tr>
+      <th>#</th>
+      <th>Név</th>
+      <th>Pálya1</th>
+      <th>Pálya2</th>
+      <th>Pálya3</th>
+      <th>Összidő</th>
+    </tr>
   </thead>
   <tbody>
     <!-- Üres kezdetben -->

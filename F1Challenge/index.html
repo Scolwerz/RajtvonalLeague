@@ -179,11 +179,11 @@ tr:hover {
 <div class="bg-glow"></div>
 
 <div class="header">
-  <div class="title">F1Challenge <span>Eredmények</span></div>
-  <div class="subtitle">LEADERBOARD</div>
+  <div class="title">Rajtvonal <span>F1 Challenge</span></div>
+  <div class="subtitle">EREDMÉNYEK</div>
 
   <div class="buttons">
-    <button id="defaultBtn" onclick="loadResults(this)">Main</button>
+    <button class="active" onclick="loadResults(this)">Main</button>
     <button>Egyéni</button>
     <button>Konstruktőri</button>
     <button>Statisztikák</button>
@@ -259,7 +259,7 @@ function renderTable(data){
 
  data.forEach((d,i)=>{
    let tr = document.createElement("tr");
-   tr.className="row";
+   /* tr.className="row"; */
    let rankClass = i<3 ? `rank-${i+1}` : "";
 
    let races = "";
